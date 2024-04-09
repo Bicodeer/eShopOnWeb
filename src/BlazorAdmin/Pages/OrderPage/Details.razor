@@ -1,0 +1,131 @@
+﻿@inject ILogger<Details> Logger
+@inject IJSRuntime JSRuntime
+@inject IOrderService OrderService
+
+@inherits BlazorAdmin.Helpers.BlazorComponent
+
+@namespace BlazorAdmin.Pages.OrderPage
+
+<div class="modal @_modalClass" tabindex="-1" role="dialog" style="display:@_modalDisplay">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Order Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto;height: 600px;">
+
+                @if (_order == null)
+                {
+                    <Spinner></Spinner>
+                }
+                else
+                {
+                    <div class="container">
+                        @foreach (var orderItem in _order.OrderItems)
+                        {
+                            <div class="row">
+                                @if (!string.IsNullOrEmpty(orderItem.PictureUri))
+                                {
+                                    <img class="col-md-6 esh-picture" src="@($"{orderItem.PictureUri}")">
+                                }
+
+
+                                <dl class="col-md-@(!string.IsNullOrEmpty(orderItem.PictureUri)?"6":"12") dl-horizontal">
+                                    <dt>
+                                        Product Name
+                                    </dt>
+
+                                    <dd>
+                                        @orderItem.ProductName
+                                    </dd>
+
+                                    <dt>
+                                        Unit Price
+                                    </dt>
+
+                                    <dd>
+                                        @orderItem.UnitPrice
+                                    </dd>
+
+                                    <dt>
+                                        Units
+                                    </dt>
+
+                                    <dd>
+                                        @orderItem.Units
+                                    </dd>
+
+                                    <dt>
+                                        Price
+                                    </dt>
+
+                                    <dd>
+                                        @(orderItem.UnitPrice * orderItem.Units)
+                                    </dd>
+                                </dl>
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                }
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Close">Close</button>
+                @if (_order.Status != BlazorShared.Enums.OrderStatus.Approved)
+                {
+                    <button class="btn btn-success" @onclick="ApproveClick">
+                        Approve
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (_showDetailsModal)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<int> OnApproveClick { get; set; }
+
+    private string _modalDisplay = "none;";
+    private string _modalClass = "";
+    private bool _showDetailsModal = false;
+    private Order _order = new Order();
+
+    public async Task Open(int id)
+    {
+        Logger.LogInformation("Now loading... /Order/Details/{Id}", id);
+        await new Css(JSRuntime).HideBodyOverflow();
+
+        _order = await OrderService.GetById(id);
+
+        _modalDisplay = "block;";
+        _modalClass = "fade show";
+        _showDetailsModal = true;
+
+        StateHasChanged();
+    }
+
+    public async Task Close()
+    {
+        await new Css(JSRuntime).ShowBodyOverflow();
+
+        _modalDisplay = "none";
+        _modalClass = "";
+        _showDetailsModal = false;
+    }
+    public async Task ApproveClick()
+    {
+        await OrderService.Approve(_order.Id);
+        await OnApproveClick.InvokeAsync();
+        await Close();
+    }
+}

@@ -19,6 +19,9 @@ public class MappingProfile : Profile
             .ForMember(dto => dto.Name, options => options.MapFrom(src => src.Brand));
         CreateMap<Order, OrderDto>(); 
         CreateMap<Address, AddressDto>(); 
-        CreateMap<OrderItem, OrderItemDto>(); 
+        CreateMap<OrderItem, OrderItemDto>()
+            .ForMember(dto => dto.CatalogItemId, options => options.MapFrom(src => src.ItemOrdered.CatalogItemId))
+            .ForMember(dto => dto.ProductName, options => options.MapFrom(src => src.ItemOrdered.ProductName))
+            .ForMember(dto => dto.PictureUri, options => options.MapFrom(src => src.ItemOrdered.PictureUri));
     }
 }

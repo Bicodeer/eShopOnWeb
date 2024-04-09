@@ -13,6 +13,6 @@ public class OrderFilterPaginatedSpecification : Specification<Order>
         {
             take = int.MaxValue;
         }
-        Query.Skip(skip).Take(take);
+        Query.Include(o => o.OrderItems).Skip(skip).Take(take);
     }
 }

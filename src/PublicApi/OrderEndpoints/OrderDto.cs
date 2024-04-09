@@ -6,7 +6,7 @@ namespace Microsoft.eShopWeb.PublicApi.OrderEndpoints;
 
 public class OrderDto
 {
-
+    public int Id { get; set; }
     public string BuyerId { get; set; }
     public DateTimeOffset OrderDate { get; set; }
     public AddressDto ShipToAddress { get; set; }
@@ -26,6 +26,9 @@ public class AddressDto
 
 public class OrderItemDto
 {
+    public int CatalogItemId { get; set; }
+    public string ProductName { get; set; }
+    public string PictureUri { get; set; }
     public decimal UnitPrice { get; set; }
     public int Units { get; set; }
 }
