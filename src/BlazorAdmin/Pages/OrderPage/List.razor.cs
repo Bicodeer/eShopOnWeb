@@ -12,8 +12,8 @@ public partial class List : BlazorComponent
     public IOrderService OrderService { get; set; }
 
     private List<Order> Orders = new List<Order>();
-   
-   
+
+    private Details DetailsComponent { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -27,12 +27,17 @@ public partial class List : BlazorComponent
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async void DetailsClick(string id)
+    private async void DetailsClick(int id)
     {
-
+        await DetailsComponent.Open(id);
     }
 
-    private async Task ReloadCatalogItems()
+    private async void ApproveClick(int id)
+    {
+        await DetailsComponent.Open(id);
+    }
+
+    private async Task ReloadOrders()
     {
         Orders = await  OrderService.List();
         StateHasChanged();

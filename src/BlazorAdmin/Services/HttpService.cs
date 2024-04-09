@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using BlazorShared;
 using BlazorShared.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace BlazorAdmin.Services;
@@ -74,7 +75,7 @@ public class HttpService
         var result = await _httpClient.PutAsync($"{_apiUrl}{uri}", content);
         if (!result.IsSuccessStatusCode)
         {
-            _toastService.ShowToast("Error", ToastLevel.Error);
+            _toastService.ShowToast($"Error", ToastLevel.Error);
             return null;
         }
 
